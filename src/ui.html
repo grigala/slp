@@ -1,0 +1,506 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        :root {
+            --text: #f5f5f7;
+            --muted: rgba(235, 235, 245, 0.55);
+            --faint: rgba(235, 235, 245, 0.32);
+            --line: rgba(255, 255, 255, 0.09);
+            --card: rgba(255, 255, 255, 0.045);
+            --card-hover: rgba(255, 255, 255, 0.085);
+            --card-border: rgba(255, 255, 255, 0.10);
+            --blue: #3b82f6;
+            --blue-hover: #4b8ef8;
+            --orange: #ff9f0a;
+            --red: #ff453a;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            background: transparent;
+            color: var(--text);
+            font: 13px/1.25 -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+            -webkit-user-select: none;
+            user-select: none;
+            cursor: default;
+            overflow: hidden;
+        }
+
+        #root {
+            padding: 12px 14px 10px;
+            background: rgba(22, 22, 24, 0.92);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 2px 2px 10px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        header h1 {
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+        }
+
+        header span {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        section {
+            padding: 12px 12px 12px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        section:last-of-type {
+            border-bottom: none;
+        }
+
+        h2 {
+            font-size: 13.5px;
+            font-weight: 600;
+            color: var(--muted);
+            margin-bottom: 9px;
+        }
+
+        button {
+            font: inherit;
+            color: inherit;
+            background: none;
+            border: none;
+            cursor: default;
+            outline: none;
+        }
+
+        /* Action segmented control */
+        .segmented {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            background: rgba(0, 0, 0, 0.28);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            padding: 2px;
+            gap: 2px;
+        }
+
+        .segmented button {
+            padding: 5px 0;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 12px;
+            color: var(--muted);
+            transition: background .12s, color .12s;
+        }
+
+        .segmented button:hover {
+            color: var(--text);
+        }
+
+        .segmented button.on {
+            background: rgba(255, 255, 255, 0.17);
+            color: var(--text);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, .35), inset 0 0.5px 0 rgba(255, 255, 255, .12);
+        }
+
+        /* Preset grid */
+        .presets {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .card {
+            background: linear-gradient(180deg, rgba(255, 255, 255, .06), rgba(255, 255, 255, .025));
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            box-shadow: inset 0 0.5px 0 rgba(255, 255, 255, .08), 0 1px 2px rgba(0, 0, 0, .25);
+            transition: background .12s, transform .06s;
+        }
+
+        .card:hover {
+            background: var(--card-hover);
+        }
+
+        .card:active {
+            transform: scale(0.98);
+        }
+
+        .presets .card {
+            height: 50px;
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        /* Custom timer */
+        .target {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 0 2px 10px;
+        }
+
+        .target .left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--muted);
+            font-weight: 600;
+            font-size: 13.5px;
+        }
+
+        .target input {
+            width: 56px;
+            text-align: center;
+            font: 600 15px -apple-system, sans-serif;
+            color: var(--text);
+            background: rgba(255, 255, 255, 0.07);
+            border: none;
+            border-radius: 6px;
+            padding: 3px 6px;
+            outline: none;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .target input:focus {
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .badge {
+            color: #5b9bff;
+            background: rgba(59, 130, 246, 0.14);
+            border: 1px solid rgba(59, 130, 246, 0.45);
+            border-radius: 6px;
+            padding: 1px 6px;
+            font-weight: 600;
+            font-size: 12px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .steppers {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px 12px;
+        }
+
+        .stepper {
+            display: grid;
+            grid-template-columns: 1fr 1.1fr 1fr;
+            height: 30px;
+            background: rgba(255, 255, 255, .035);
+            border: 1px solid var(--card-border);
+            border-radius: 7px;
+            overflow: hidden;
+        }
+
+        .stepper > * {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stepper .val {
+            font-weight: 700;
+            font-size: 12px;
+            border-left: 1px solid var(--line);
+            border-right: 1px solid var(--line);
+        }
+
+        .stepper button {
+            font-size: 17px;
+            font-weight: 600;
+            transition: background .1s;
+        }
+
+        .stepper button:hover {
+            background: rgba(255, 255, 255, .07);
+        }
+
+        .stepper button:active {
+            background: rgba(255, 255, 255, .12);
+        }
+
+        .stepper .minus {
+            color: var(--orange);
+        }
+
+        .stepper .plus {
+            color: var(--blue);
+        }
+
+        .primary {
+            width: 100%;
+            height: 34px;
+            margin-top: 12px;
+            border-radius: 8px;
+            background: var(--blue);
+            color: #fff;
+            font-size: 15px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: inset 0 0.5px 0 rgba(255, 255, 255, .25), 0 1px 3px rgba(0, 0, 0, .3);
+            transition: background .12s, transform .06s;
+        }
+
+        .primary:hover {
+            background: var(--blue-hover);
+        }
+
+        .primary:active {
+            transform: scale(0.99);
+        }
+
+        .primary:disabled {
+            opacity: .45;
+        }
+
+        .primary svg {
+            width: 17px;
+            height: 17px;
+        }
+
+        /* Running timer */
+        #running {
+            display: none;
+        }
+
+        body.running #running {
+            display: block;
+        }
+
+        .countdown {
+            text-align: center;
+            font-size: 40px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            font-variant-numeric: tabular-nums;
+            margin: 2px 0 0;
+        }
+
+        .countdown-sub {
+            text-align: center;
+            color: var(--muted);
+            font-weight: 500;
+            margin-bottom: 12px;
+        }
+
+        .row3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+        }
+
+        .row3 .card {
+            height: 32px;
+            font-weight: 600;
+        }
+
+        .row3 .danger {
+            color: var(--red);
+        }
+
+        footer {
+            border-top: 1px solid var(--line);
+            padding: 8px 0 0;
+        }
+
+        .menu-item {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 13.5px;
+        }
+
+        .menu-item:hover {
+            background: var(--blue);
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+<div id="root">
+    <section>
+        <h2>Action</h2>
+        <div class="segmented" id="actions">
+            <button data-action="sleep">Sleep</button>
+            <button data-action="shutdown">Shut Down</button>
+            <button data-action="restart">Restart</button>
+        </div>
+    </section>
+
+    <section id="running">
+        <h2>Active Timer</h2>
+        <div class="countdown" id="countdown">0:00</div>
+        <div class="countdown-sub" id="countdown-sub"></div>
+        <div class="row3">
+            <button class="card" data-extend="5">+5m</button>
+            <button class="card" data-extend="15">+15m</button>
+            <button class="card danger" id="cancel">Cancel</button>
+        </div>
+    </section>
+
+    <section>
+        <h2>Preset Timers</h2>
+        <div class="presets">
+            <button class="card" data-preset="15">15m</button>
+            <button class="card" data-preset="30">30m</button>
+            <button class="card" data-preset="45">45m</button>
+            <button class="card" data-preset="120">2h</button>
+        </div>
+    </section>
+
+    <section>
+        <h2>Custom Timer</h2>
+        <div class="target">
+            <div class="left"><span><span id="verb">Sleep</span> at</span><input type="text" id="at" maxlength="5"
+                                                                                 spellcheck="false" autocomplete="off">
+            </div>
+            <span class="badge" id="badge">in 0h 30m</span>
+        </div>
+        <div class="steppers">
+            <div class="stepper">
+                <button class="minus" data-step="-1">−</button>
+                <span class="val">1m</span>
+                <button class="plus" data-step="1">+</button>
+            </div>
+            <div class="stepper">
+                <button class="minus" data-step="-5">−</button>
+                <span class="val">5m</span>
+                <button class="plus" data-step="5">+</button>
+            </div>
+            <div class="stepper">
+                <button class="minus" data-step="-15">−</button>
+                <span class="val">15m</span>
+                <button class="plus" data-step="15">+</button>
+            </div>
+            <div class="stepper">
+                <button class="minus" data-step="-60">−</button>
+                <span class="val">1h</span>
+                <button class="plus" data-step="60">+</button>
+            </div>
+        </div>
+        <button class="primary" id="start">
+            <svg viewBox="0 0 20 20">
+                <circle cx="10" cy="10" r="10" fill="#fff"/>
+                <path d="M8 6.2v7.6L14 10z" fill="#3b82f6"/>
+            </svg>
+            <span>Start</span>
+        </button>
+    </section>
+
+    <footer>
+        <button class="menu-item" id="quit">Quit slp</button>
+    </footer>
+</div>
+
+<script>
+    const MAX_MIN = 24 * 60;
+    const TABS = {sleep: "Sleep", shutdown: "Shut down", restart: "Restart"};
+    const $ = (id) => document.getElementById(id);
+    const send = (msg) => window.ipc.postMessage(JSON.stringify(msg));
+
+    let state = {action: "sleep", running: false, remaining: 0};
+    let customMin = 30;
+
+    const pad = (n) => String(n).padStart(2, "0");
+    const hhmm = (d) => `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+
+    function fmtCountdown(s) {
+        const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
+        return h ? `${h}:${pad(m)}:${pad(sec)}` : `${m}:${pad(sec)}`;
+    }
+
+    function renderCustom() {
+        const at = new Date(Date.now() + customMin * 60000);
+        if (document.activeElement !== $("at")) $("at").value = hhmm(at);
+        $("badge").textContent = `in ${Math.floor(customMin / 60)}h ${customMin % 60}m`;
+        $("start").disabled = customMin < 1;
+    }
+
+    function render() {
+        document.querySelectorAll("#actions button").forEach((b) =>
+            b.classList.toggle("on", b.dataset.action === state.action));
+        $("verb").textContent = TABS[state.action];
+        document.body.classList.toggle("running", state.running);
+        if (state.running) {
+            $("countdown").textContent = fmtCountdown(state.remaining);
+            const at = new Date(Date.now() + state.remaining * 1000);
+            $("countdown-sub").textContent = `${TABS[state.action]} at ${hhmm(at)}`;
+        }
+        renderCustom();
+        reportSize();
+    }
+
+    // Called from Rust.
+    window.update = (s) => {
+        state = s;
+        render();
+    };
+
+    let lastHeight = 0;
+
+    function reportSize() {
+        const h = Math.ceil($("root").getBoundingClientRect().height);
+        if (h !== lastHeight) {
+            lastHeight = h;
+            send({cmd: "resize", height: h});
+        }
+    }
+
+    document.addEventListener("click", (e) => {
+        const b = e.target.closest("button");
+        if (!b) return;
+        if (b.dataset.action) send({cmd: "action", value: b.dataset.action});
+        else if (b.dataset.preset) send({cmd: "start", minutes: +b.dataset.preset});
+        else if (b.dataset.extend) send({cmd: "extend", minutes: +b.dataset.extend});
+        else if (b.dataset.step) {
+            customMin = Math.min(MAX_MIN, Math.max(0, customMin + +b.dataset.step));
+            renderCustom();
+        } else if (b.id === "start" && customMin >= 1) send({cmd: "start", minutes: customMin});
+        else if (b.id === "cancel") send({cmd: "cancel"});
+        else if (b.id === "quit") send({cmd: "quit"});
+    });
+
+    // Typing a clock time sets the custom duration to the next occurrence of it.
+    $("at").addEventListener("focus", () => $("at").select());
+    $("at").addEventListener("change", () => {
+        const match = $("at").value.trim().match(/^(\d{1,2})[:.]?(\d{2})$/);
+        const h = match ? +match[1] : NaN, m = match ? +match[2] : NaN;
+        if (!(h < 24 && m < 60)) {
+            renderCustom();
+            return;
+        }
+        const now = new Date();
+        const target = new Date(now);
+        target.setHours(h, m, 0, 0);
+        if (target <= now) target.setDate(target.getDate() + 1);
+        customMin = Math.max(1, Math.round((target - now) / 60000));
+        renderCustom();
+    });
+
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") send({cmd: "hide"});
+        if (e.key === "Enter" && document.activeElement === $("at")) $("at").blur();
+    });
+    document.addEventListener("contextmenu", (e) => e.preventDefault());
+
+    render();
+</script>
+</body>
+</html>
